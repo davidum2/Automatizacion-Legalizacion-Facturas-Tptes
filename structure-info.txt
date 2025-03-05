@@ -1,0 +1,101 @@
+# Sistema de Automatización de Documentos por Partidas
+
+Este proyecto es una refactorización del sistema original para automatizar la generación de documentos relacionados con facturas XML, adaptado para trabajar con múltiples partidas desde un archivo Excel central.
+
+## Estructura del Proyecto
+
+```
+proyecto/
+  ├── main.py                         # Punto de entrada de la aplicación
+  ├── requirements.txt                # Dependencias del proyecto
+  ├── setup.py                        # Script de instalación
+  ├── LEEME.txt                       # Instrucciones en español
+  ├── core/                           # Núcleo de la aplicación
+  │   ├── __init__.py
+  │   ├── excel_reader.py             # Lector de archivos Excel
+  │   ├── xml_processor.py            # Procesador de archivos XML
+  │   └── document_generator.py       # Generador de documentos
+  ├── generators/                     # Generadores específicos
+  │   ├── __init__.py
+  │   ├── oficio_de_remision.py       # Generador de oficios de remisión
+  │   ├── legalizacionFactura.py      # Generador de legalización de factura
+  │   ├── legalizacionVerificacion.py # Generador de legalización de verificación
+  │   ├── legalizacionXml.py          # Generador de legalización de XML
+  │   ├── crearDocXml.py              # Generador de documento XML
+  │   ├── plantillas_pdf.py           # Generador de plantillas PDF
+  │   └── createRelacionFacturas.py   # Generador de relación de facturas
+  ├── ui/                             # Componentes de interfaz
+  │   ├── __init__.py
+  │   └── date_selector.py            # Selector de fechas
+  ├── utils/                          # Utilidades
+  │   ├── __init__.py
+  │   ├── file_utils.py               # Utilidades para archivos
+  │   ├── web_utils.py                # Utilidades para web scraping
+  │   └── formatters.py               # Utilidades para formateo
+  └── templates/                      # Plantillas para documentos
+      ├── legalizacion_factura.docx
+      ├── legalizacion_verificacion.docx
+      ├── legalizacion_xml.docx
+      ├── xml.docx
+      └── oficio_remision.docx
+```
+
+## Requisitos
+
+- Python 3.7+
+- Bibliotecas: ver `requirements.txt`
+
+## Instalación
+
+1. Clona o descarga este repositorio
+2. Instala las dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Uso
+
+1. Ejecuta la aplicación:
+
+```bash
+python main.py
+```
+
+2. Selecciona el archivo Excel con la información de partidas
+3. Completa los datos del formulario
+4. Haz clic en "Procesar" para generar los documentos
+
+## Estructura del Excel
+
+El archivo Excel debe contener al menos las siguientes columnas:
+- Partida: Número de la partida
+- Descripcion: Descripción de la partida
+- Monto: Monto asignado a la partida
+
+## Estructura de Carpetas
+
+La aplicación espera la siguiente estructura de carpetas:
+
+```
+/ruta/al/Excel.xlsx
+/ruta/al/24101/          # Carpeta con el número de partida
+  ├── compra1/           # Subcarpeta para cada compra
+  │   ├── factura.xml    # Archivo XML de la factura
+  │   └── factura.pdf    # PDF original de la factura (opcional)
+  └── compra2/           # Otra compra
+      ├── factura.xml
+      └── factura.pdf
+```
+
+## Funcionalidades
+
+- Lectura de archivos Excel con información de partidas
+- Procesamiento de múltiples archivos XML en varias carpetas
+- Generación de documentos Word, PDF y Excel
+- Descarga de verificaciones del SAT
+- Conversión automática de documentos Word a PDF
+
+## Autor
+
+[Tu Nombre]
