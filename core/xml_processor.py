@@ -10,8 +10,7 @@ class XMLProcessor:
     """
     
     def read_xml(self, file_path, numero_mensaje, fecha_mensaje_asignacion, 
-                mes_asignado, monto_asignado, fecha_documento, partida_numero, 
-                no_of_remision, fecha_remision):
+                mes_asignado, monto_asignado, fecha_documento, fecha_remision):
         """
         Lee y analiza un archivo XML para extraer información relevante.
         
@@ -126,29 +125,7 @@ class XMLProcessor:
             # Convertir todo el contenido del XML a una cadena de texto
             xml_string = ET.tostring(root, encoding='unicode')
             
-            # Mapeo de partidas y sus descripciones
-            partida_info = {
-                '24101': {
-                    'empleo_del_recurso': 'la adquisición de materiales y útiles de oficina',
-                    'descripcion': 'MATERIALES Y ÚTILES DE OFICINA'
-                },
-                '31202': {
-                    'empleo_del_recurso': 'la adquisición de Gas L.P.',
-                    'descripcion': 'SERVICIO DE GAS'
-                },
-                '31401': {
-                    'empleo_del_recurso': 'el pago del servicio telefónico',
-                    'descripcion': 'SERVICIO TELÉFONO CONVENCIONAL'
-                }
-                # Agregar más partidas según sea necesario
-            }
-            
-            # Obtener la información de la partida
-            partida_data = partida_info.get(partida_numero, {
-                'empleo_del_recurso': f'la partida {partida_numero}',
-                'descripcion': f'PARTIDA {partida_numero}'
-            })
-            
+                       
             # Construir y devolver el diccionario de datos
             factura_data = {
                 'No_mensaje': numero_mensaje,
@@ -168,12 +145,7 @@ class XMLProcessor:
                 'Rfc_emisor': emisor_info['Rfc'],
                 'Rfc_receptor': receptor_info['Rfc'],
                 'Folio_Fiscal': folio_fiscal,
-                'No_partida': partida_numero,
-                'Descripcion_partida': partida_data['descripcion'],
-                'Empleo_recurso': partida_data['empleo_del_recurso'],
                 'Nombre_Emisor': emisor_info['Nombre'],
-                'No_of_remision': no_of_remision,
-                'Fecha_remision': fecha_remision
             }
             
             return factura_data

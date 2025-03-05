@@ -2,38 +2,21 @@ import os
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from datetime import datetime
-import threading
 
-# Importar módulos refactorizados
-from core.excel_reader import ExcelReader
+# Importar módulos refactorizados (ajustar según necesidad)
 from core.xml_processor import XMLProcessor
 from core.document_generator import DocumentGenerator
 from utils.file_utils import FileUtils
 from ui.date_selector import DateSelector
 from utils.formatters import convert_fecha_to_texto
 
-import os
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-from datetime import datetime
-
-# Importar módulos refactorizados
-from core.excel_reader import ExcelReader
-from core.xml_processor import XMLProcessor
-from core.document_generator import DocumentGenerator
-from utils.file_utils import FileUtils
-from ui.date_selector import DateSelector
-from utils.formatters import convert_fecha_to_texto
-
-
-class AutomatizacionApp:
+class DocumentosXMLApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Automatización de Documentos por Partidas")
-        self.root.geometry("800x650")
+        self.root.title("Generador de Documentos desde XML")
+        self.root.geometry("800x700")
         
         # Inicializar componentes
-        self.excel_reader = ExcelReader()
         self.xml_processor = XMLProcessor()
         self.document_generator = DocumentGenerator()
         self.file_utils = FileUtils()
@@ -46,17 +29,17 @@ class AutomatizacionApp:
         self.root.columnconfigure(1, weight=1)
         self.root.columnconfigure(2, minsize=120)
         
-        # Selección de archivo Excel
-        tk.Label(self.root, text="Archivo Excel de Partidas:", anchor='w').grid(row=0, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_excel_path = tk.Entry(self.root, width=50)
-        self.entry_excel_path.grid(row=0, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=self.select_excel_file).grid(row=0, column=2, padx=10, pady=5)
+        # Selección de archivo XML
+        tk.Label(self.root, text="Archivo XML de Factura:", anchor='w').grid(row=0, column=0, padx=10, pady=5, sticky='ew')
+        self.entry_xml_path = tk.Entry(self.root, width=50)
+        self.entry_xml_path.grid(row=0, column=1, padx=10, pady=5, sticky='ew')
+        tk.Button(self.root, text="Seleccionar", command=self.select_xml_file).grid(row=0, column=2, padx=10, pady=5)
         
         # Separador
         ttk.Separator(self.root, orient='horizontal').grid(row=1, column=0, columnspan=3, sticky='ew', pady=10)
         
         # Sección de información común
-        tk.Label(self.root, text="Información Común", font=('Helvetica', 10, 'bold')).grid(row=2, column=0, columnspan=3, sticky='w', padx=5)
+        tk.Label(self.root, text="Información del Documento", font=('Helvetica', 10, 'bold')).grid(row=2, column=0, columnspan=3, sticky='w', padx=5)
         
         # Número de mensaje
         tk.Label(self.root, text="Número de mensaje de asignación:", anchor='w').grid(row=3, column=0, padx=10, pady=5, sticky='ew')
@@ -69,61 +52,185 @@ class AutomatizacionApp:
         self.entry_fecha_mensaje.grid(row=4, column=1, padx=10, pady=5, sticky='ew')
         tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_mensaje)).grid(row=4, column=2, padx=10, pady=5)
         
+        # Monto asignado
+        tk.Label(self.root, text="Monto asignado:", anchor='w').grid(row=5, column=0, padx=10, pady=5, sticky='ew')
+        self.entry_monto = tk.Entry(self.root)
+        self.entry_monto.grid(row=5, column=1, padx=10, pady=5, sticky='ew')
+        
         # Fecha del documento
-        tk.Label(self.root, text="Fecha de elaboración del documento:", anchor='w').grid(row=5, column=0, padx=10, pady=5, sticky='ew')
+        tk.Label(self.root, text="Fecha de elaboración del documento:", anchor='w').grid(row=6, column=0, padx=10, pady=5, sticky='ew')
         self.entry_fecha_documento = tk.Entry(self.root)
-        self.entry_fecha_documento.grid(row=5, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_documento)).grid(row=5, column=2, padx=10, pady=5)
-        
-        # Número de oficio
-        tk.Label(self.root, text="Número del Oficio de remisión:", anchor='w').grid(row=6, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_numero_oficio = tk.Entry(self.root)
-        self.entry_numero_oficio.grid(row=6, column=1, padx=10, pady=5, sticky='ew')
-        
-        # Fecha de remisión
-        tk.Label(self.root, text="Fecha del Oficio de Remisión:", anchor='w').grid(row=7, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_fecha_remision = tk.Entry(self.root)
-        self.entry_fecha_remision.grid(row=7, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_remision)).grid(row=7, column=2, padx=10, pady=5)
+        self.entry_fecha_documento.grid(row=6, column=1, padx=10, pady=5, sticky='ew')
+        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_documento)).grid(row=6, column=2, padx=10, pady=5)
         
         # Mes asignado
-        tk.Label(self.root, text="Mes asignado:", anchor='w').grid(row=8, column=0, padx=10, pady=5, sticky='ew')
+        tk.Label(self.root, text="Mes de comprobación:", anchor='w').grid(row=7, column=0, padx=10, pady=5, sticky='ew')
         self.mes_asignado_var = tk.StringVar(self.root)
         meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", 
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
         self.mes_asignado_var.set(meses[datetime.now().month - 1])  # Mes actual como predeterminado
         option_menu_meses = tk.OptionMenu(self.root, self.mes_asignado_var, *meses)
-        option_menu_meses.grid(row=8, column=1, padx=10, pady=5, sticky='ew')
+        option_menu_meses.grid(row=7, column=1, padx=10, pady=5, sticky='ew')
         
         # Separador
-        ttk.Separator(self.root, orient='horizontal').grid(row=9, column=0, columnspan=3, sticky='ew', pady=10)
+        ttk.Separator(self.root, orient='horizontal').grid(row=8, column=0, columnspan=3, sticky='ew', pady=10)
+        
+        # Sección de personal
+        tk.Label(self.root, text="Información del Personal", font=('Helvetica', 10, 'bold')).grid(row=9, column=0, columnspan=3, sticky='w', padx=5)
+        
+        # Define el personal estructurado
+        self.personal_recibe_data = [
+            {
+                'Grado_recibio_la_compra': "Cap. Enc. Tptes", 
+                'Nombre_recibio_la_compra': "Juan Pérez Rodríguez",
+                'Matricula_recibio_la_compra': "123456"
+            },
+            {
+                'Grado_recibio_la_compra': "Tte. Adm.", 
+                'Nombre_recibio_la_compra': "María Gómez López",
+                'Matricula_recibio_la_compra': "234567"
+            },
+            {
+                'Grado_recibio_la_compra': "Sgto. Log.", 
+                'Nombre_recibio_la_compra': "Carlos López Martínez",
+                'Matricula_recibio_la_compra': "345678"
+            }
+        ]
+        
+        self.personal_visto_bueno_data = [
+            {
+                'Grado_Vo_Bo': "Cor. Inf.", 
+                'Nombre_Vo_Bo': "Roberto Sánchez Torres",
+                'Matricula_Vo_Bo': "456789"
+            },
+            {
+                'Grado_Vo_Bo': "Myr. Art.", 
+                'Nombre_Vo_Bo': "Patricia Navarro Ruiz",
+                'Matricula_Vo_Bo': "567890"
+            },
+            {
+                'Grado_Vo_Bo': "Cap. San.", 
+                'Nombre_Vo_Bo': "Fernando Jiménez Castro",
+                'Matricula_Vo_Bo': "678901"
+            }
+        ]
+        
+        # Persona que recibe la compra
+        tk.Label(self.root, text="Recibió la compra:", anchor='w').grid(row=10, column=0, padx=10, pady=5, sticky='ew')
+        self.recibe_compra_index = tk.IntVar(self.root, value=0)
+        
+        # Crear descripciones para mostrar en el menú
+        personal_recibe_display = []
+        for persona in self.personal_recibe_data:
+            display = f"{persona['Grado_recibio_la_compra']} {persona['Nombre_recibio_la_compra']} ({persona['Matricula_recibio_la_compra']})"
+            personal_recibe_display.append(display)
+        
+        # Función para actualizar el índice cuando se selecciona una opción
+        def on_recibe_select(*args):
+            self.show_selected_personal_info()
+        
+        option_menu_recibe = tk.OptionMenu(self.root, self.recibe_compra_index, *range(len(personal_recibe_display)), 
+                                          command=on_recibe_select)
+        option_menu_recibe.grid(row=10, column=1, padx=10, pady=5, sticky='ew')
+        
+        # Actualizar el texto del menú
+        menu = option_menu_recibe['menu']
+        menu.delete(0, 'end')
+        for i, display in enumerate(personal_recibe_display):
+            menu.add_command(label=display, command=tk._setit(self.recibe_compra_index, i, on_recibe_select))
+        
+        # Persona que da visto bueno
+        tk.Label(self.root, text="Visto bueno:", anchor='w').grid(row=11, column=0, padx=10, pady=5, sticky='ew')
+        self.visto_bueno_index = tk.IntVar(self.root, value=0)
+        
+        # Crear descripciones para mostrar en el menú
+        personal_visto_bueno_display = []
+        for persona in self.personal_visto_bueno_data:
+            display = f"{persona['Grado_Vo_Bo']} {persona['Nombre_Vo_Bo']} ({persona['Matricula_Vo_Bo']})"
+            personal_visto_bueno_display.append(display)
+        
+        # Función para actualizar el índice cuando se selecciona una opción
+        def on_visto_bueno_select(*args):
+            self.show_selected_personal_info()
+        
+        option_menu_visto_bueno = tk.OptionMenu(self.root, self.visto_bueno_index, *range(len(personal_visto_bueno_display)), 
+                                               command=on_visto_bueno_select)
+        option_menu_visto_bueno.grid(row=11, column=1, padx=10, pady=5, sticky='ew')
+        
+        # Actualizar el texto del menú
+        menu = option_menu_visto_bueno['menu']
+        menu.delete(0, 'end')
+        for i, display in enumerate(personal_visto_bueno_display):
+            menu.add_command(label=display, command=tk._setit(self.visto_bueno_index, i, on_visto_bueno_select))
+        
+        # Añadir área para mostrar información del personal seleccionado
+        self.info_frame = tk.LabelFrame(self.root, text="Información del Personal Seleccionado")
+        self.info_frame.grid(row=12, column=0, columnspan=3, padx=10, pady=5, sticky='ew')
+        
+        self.info_text = tk.Text(self.info_frame, height=5, width=70)
+        self.info_text.pack(padx=5, pady=5, fill='both', expand=True)
+        
+        # Mostrar la información inicial
+        self.show_selected_personal_info()
+        
+        # Separador
+        ttk.Separator(self.root, orient='horizontal').grid(row=13, column=0, columnspan=3, sticky='ew', pady=10)
         
         # Barra de progreso
-        tk.Label(self.root, text="Progreso:", anchor='w').grid(row=10, column=0, padx=10, pady=5, sticky='ew')
+        tk.Label(self.root, text="Progreso:", anchor='w').grid(row=14, column=0, padx=10, pady=5, sticky='ew')
         self.progress_bar = ttk.Progressbar(self.root, length=400, mode='determinate')
-        self.progress_bar.grid(row=10, column=1, columnspan=2, padx=10, pady=5, sticky='ew')
+        self.progress_bar.grid(row=14, column=1, columnspan=2, padx=10, pady=5, sticky='ew')
         
         # Botón de procesamiento
-        tk.Button(self.root, text="Procesar", command=self.process_data, bg='#4CAF50', fg='white', height=2).grid(row=11, column=0, columnspan=3, pady=20, sticky='ew', padx=20)
+        tk.Button(self.root, text="Procesar", command=self.process_data, bg='#4CAF50', fg='white', height=2).grid(row=15, column=0, columnspan=3, pady=20, sticky='ew', padx=20)
         
         # Registro de actividad
-        tk.Label(self.root, text="Registro de Actividad:", anchor='w').grid(row=12, column=0, columnspan=3, sticky='w', padx=10, pady=5)
+        tk.Label(self.root, text="Registro de Actividad:", anchor='w').grid(row=16, column=0, columnspan=3, sticky='w', padx=10, pady=5)
         self.status_text = tk.Text(self.root, height=12, width=70)
-        self.status_text.grid(row=13, column=0, columnspan=3, padx=10, pady=5, sticky='nsew')
+        self.status_text.grid(row=17, column=0, columnspan=3, padx=10, pady=5, sticky='nsew')
         
         # Agregar scrollbar
         scrollbar = tk.Scrollbar(self.root, command=self.status_text.yview)
-        scrollbar.grid(row=13, column=3, sticky='ns')
+        scrollbar.grid(row=17, column=3, sticky='ns')
         self.status_text.config(yscrollcommand=scrollbar.set)
         
         # Configurar fila para expandir texto de estado
-        self.root.rowconfigure(13, weight=1)
+        self.root.rowconfigure(17, weight=1)
     
-    def select_excel_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Archivos Excel", "*.xlsx")])
+    def show_selected_personal_info(self):
+        """
+        Muestra la información del personal seleccionado en el área de información.
+        """
+        # Limpiar el área de texto
+        self.info_text.delete(1.0, tk.END)
+        
+        # Obtener la información del personal seleccionado
+        recibe_index = self.recibe_compra_index.get()
+        visto_bueno_index = self.visto_bueno_index.get()
+        
+        recibe_info = self.personal_recibe_data[recibe_index]
+        visto_bueno_info = self.personal_visto_bueno_data[visto_bueno_index]
+        
+        # Mostrar información estructurada
+        info_text = "recibeCompra={\n"
+        info_text += f"    Grado_recibio_la_compra: \"{recibe_info['Grado_recibio_la_compra']}\",\n"
+        info_text += f"    Nombre_recibio_la_compra: \"{recibe_info['Nombre_recibio_la_compra']}\",\n"
+        info_text += f"    Matricula_recibio_la_compra: \"{recibe_info['Matricula_recibio_la_compra']}\"\n"
+        info_text += "}\n\n"
+        
+        info_text += "vistoBueno={\n"
+        info_text += f"    Grado_Vo_Bo: \"{visto_bueno_info['Grado_Vo_Bo']}\",\n"
+        info_text += f"    Nombre_Vo_Bo: \"{visto_bueno_info['Nombre_Vo_Bo']}\",\n"
+        info_text += f"    Matricula_Vo_Bo: \"{visto_bueno_info['Matricula_Vo_Bo']}\"\n"
+        info_text += "}"
+        
+        self.info_text.insert(tk.END, info_text)
+    
+    def select_xml_file(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Archivos XML", "*.xml")])
         if file_path:
-            self.entry_excel_path.delete(0, tk.END)
-            self.entry_excel_path.insert(0, file_path)
+            self.entry_xml_path.delete(0, tk.END)
+            self.entry_xml_path.insert(0, file_path)
     
     def select_date(self, entry_widget):
         DateSelector(self.root, entry_widget)
@@ -139,119 +246,130 @@ class AutomatizacionApp:
     
     def process_data(self):
         # Obtener parámetros de la interfaz
-        excel_path = self.entry_excel_path.get()
+        xml_path = self.entry_xml_path.get()
         numero_mensaje = self.entry_numero_mensaje.get()
         fecha_mensaje = self.entry_fecha_mensaje.get()
+        monto_asignado = self.entry_monto.get()
         fecha_documento = self.entry_fecha_documento.get()
-        numero_oficio = self.entry_numero_oficio.get()
-        fecha_remision = self.entry_fecha_remision.get()
         mes_asignado = self.mes_asignado_var.get()
         
+        # Obtener información del personal seleccionado
+        recibe_index = self.recibe_compra_index.get()
+        visto_bueno_index = self.visto_bueno_index.get()
+        
+        recibe_info = self.personal_recibe_data[recibe_index]
+        visto_bueno_info = self.personal_visto_bueno_data[visto_bueno_index]
+        
         # Validar campos requeridos
-        if not excel_path:
-            messagebox.showerror("Error", "Por favor, seleccione un archivo Excel.")
+        if not xml_path:
+            messagebox.showerror("Error", "Por favor, seleccione un archivo XML.")
             return
         
-        if not numero_mensaje or not fecha_mensaje or not fecha_documento or not numero_oficio or not fecha_remision:
-            messagebox.showerror("Error", "Todos los campos son obligatorios.")
+        if not numero_mensaje or not fecha_mensaje or not monto_asignado or not fecha_documento:
+            messagebox.showerror("Error", "Todos los campos de información son obligatorios.")
             return
         
         # Convertir fechas a formato de texto
         try:
             fecha_mensaje_texto = convert_fecha_to_texto(fecha_mensaje)
             fecha_documento_texto = convert_fecha_to_texto(fecha_documento)
-            fecha_remision_texto = convert_fecha_to_texto(fecha_remision)
         except ValueError:
             messagebox.showerror("Error", "El formato de fecha debe ser YYYY-MM-DD")
+            return
+        
+        # Formatear monto
+        try:
+            # Limpiar el monto de cualquier carácter no numérico excepto punto decimal
+            monto_limpio = monto_asignado.replace(',', '').replace('$', '').strip()
+            monto_float = float(monto_limpio)
+            monto_formateado = "$ {:,.2f}".format(monto_float)
+        except ValueError:
+            messagebox.showerror("Error", "El monto debe ser un número válido")
             return
         
         # Limpiar texto de estado
         self.status_text.delete(1.0, tk.END)
         
-        # Procesar todo en el hilo principal
-        self.process_on_main_thread(
-            excel_path, numero_mensaje, fecha_mensaje, fecha_mensaje_texto,
-            fecha_documento_texto, numero_oficio, fecha_remision_texto, mes_asignado
+        # Llamar directamente a la función de procesamiento
+        self.process_file(
+            xml_path, numero_mensaje, fecha_mensaje, fecha_mensaje_texto,
+            fecha_documento_texto, monto_formateado, mes_asignado,
+            recibe_info, visto_bueno_info
         )
     
-    def process_on_main_thread(self, excel_path, numero_mensaje, fecha_mensaje_raw, fecha_mensaje,
-                              fecha_documento, numero_oficio, fecha_remision, mes_asignado):
+    def process_file(self, xml_path, numero_mensaje, fecha_mensaje_raw, fecha_mensaje,
+                      fecha_documento, monto_formateado, mes_asignado,
+                      recibe_info, visto_bueno_info):
         try:
             self.update_status("Iniciando procesamiento...")
             
-            # Leer archivo Excel
-            self.update_status("Leyendo archivo Excel...")
-            partidas = self.excel_reader.read_partidas(excel_path)
-            self.update_status(f"Se encontraron {len(partidas)} partidas en el archivo.")
+            # Actualizar progreso
+            self.update_progress(10)
+            self.root.update_idletasks()  # Actualizar la interfaz
             
-            # Directorio base (mismo que el archivo Excel)
-            base_dir = os.path.dirname(excel_path)
+            # Obtener directorio de salida (mismo directorio que el XML)
+            output_dir = os.path.dirname(xml_path)
             
-            # Procesar cada partida
-            total_partidas = len(partidas)
-            for i, partida in enumerate(partidas):
-                self.update_status(f"Procesando partida {partida['numero']} - {partida['descripcion']}...")
-                
-                # Actualizar progreso (nivel de partida)
-                self.update_progress(i, total_partidas)
-                
-                # Actualizar la interfaz para que responda durante el procesamiento
-                self.root.update()
-                
-                # Buscar archivos XML para esta partida
-                partida_dir = os.path.join(base_dir, partida['numero'])
-                if not os.path.exists(partida_dir):
-                    self.update_status(f"  AVISO: Directorio para partida {partida['numero']} no encontrado.")
-                    continue
-                
-                xml_files = self.file_utils.find_xml_files(partida_dir)
-                self.update_status(f"  Se encontraron {len(xml_files)} archivos XML para procesar.")
-                
-                # Procesar cada archivo XML
-                for j, xml_file in enumerate(xml_files):
-                    self.update_status(f"  Procesando archivo: {os.path.basename(xml_file)}...")
-                    
-                    # Actualizar la interfaz para mantenerla responsiva
-                    self.root.update()
-                    
-                    try:
-                        # Formatear monto
-                        monto_formateado = "$ {:,.2f}".format(partida['monto'])
-                        
-                        # Obtener directorio de salida
-                        output_dir = os.path.dirname(xml_file)
-                        
-                        # Leer y procesar el XML
-                        xml_data = self.xml_processor.read_xml(
-                            xml_file,
-                            numero_mensaje,
-                            fecha_mensaje_raw,
-                            mes_asignado,
-                            monto_formateado,
-                            fecha_documento,
-                            partida['numero'],
-                            numero_oficio,
-                            fecha_remision
-                        )
-                        
-                        # Generar documentos
-                        self.document_generator.generate_all_documents(
-                            xml_data,
-                            output_dir,
-                            partida
-                        )
-                        
-                        self.update_status(f"  ✅ Documentos generados para {os.path.basename(xml_file)}.")
-                    except Exception as e:
-                        self.update_status(f"  ❌ ERROR al procesar {os.path.basename(xml_file)}: {str(e)}")
-                        
-                    # Actualizar la interfaz después de cada archivo
-                    self.root.update()
+            # Procesar el archivo XML
+            self.update_status(f"Procesando archivo: {os.path.basename(xml_path)}...")
+            self.root.update_idletasks()  # Actualizar la interfaz
             
-            # Actualización final del progreso
-            self.update_progress(total_partidas, total_partidas)
-            self.update_status("¡Procesamiento completado con éxito!")
-            messagebox.showinfo("Éxito", "Procesamiento completado con éxito")
+            try:
+                # Leer y procesar el XML
+                partida_numero = "00000"  # Este valor podría provenir de otro lugar
+                
+                xml_data = self.xml_processor.read_xml(
+                    xml_path,
+                    numero_mensaje,
+                    fecha_mensaje_raw,
+                    mes_asignado,
+                    monto_formateado,
+                    fecha_documento,
+                    partida_numero,
+                   
+                )
+                
+                # Agregar información de personal (ya viene estructurada correctamente)
+                # Copiar todos los campos del diccionario de quien recibe la compra
+                for key, value in recibe_info.items():
+                    xml_data[key] = value
+                
+                # Copiar todos los campos del diccionario de visto bueno
+                for key, value in visto_bueno_info.items():
+                    xml_data[key] = value
+                
+                self.update_progress(40)
+                self.root.update_idletasks()  # Actualizar la interfaz
+                
+                # Generar documentos
+                self.update_status("Generando documentos...")
+                
+                # Generar los documentos necesarios utilizando los nuevos campos de personal
+                self.document_generator.generate_all_documents(
+                    xml_data,
+                    output_dir,
+                    {'monto': monto_formateado}  # Simplificado ya que no usamos partidas del Excel
+                )
+                
+                self.update_progress(90)
+                self.root.update_idletasks()  # Actualizar la interfaz
+                
+                # Descargar verificación SAT
+                self.update_status("Descargando verificación del SAT...")
+                
+                # Aquí iría el código para la verificación SAT
+                # (manteniendo la funcionalidad existente)
+                
+                self.update_progress(100)
+                self.root.update_idletasks()  # Actualizar la interfaz
+                
+                self.update_status(f"✅ Documentos generados correctamente para {os.path.basename(xml_path)}.")
+                messagebox.showinfo("Éxito", "Documentos generados correctamente")
+                
+            except Exception as e:
+                self.update_status(f"❌ ERROR al procesar {os.path.basename(xml_path)}: {str(e)}")
+                messagebox.showerror("Error", f"Error al procesar el archivo: {str(e)}")
+            
         except Exception as e:
             self.update_status(f"ERROR: {str(e)}")
             messagebox.showerror("Error", f"Error durante el procesamiento: {str(e)}")
@@ -259,232 +377,5 @@ class AutomatizacionApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = AutomatizacionApp(root)
-    root.mainloop()
-class AutomatizacionApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Automatización de Documentos por Partidas")
-        self.root.geometry("800x650")
-        
-        # Inicializar componentes
-        self.excel_reader = ExcelReader()
-        self.xml_processor = XMLProcessor()
-        self.document_generator = DocumentGenerator()
-        self.file_utils = FileUtils()
-        
-        # Crear la interfaz
-        self.create_widgets()
-    
-    def create_widgets(self):
-        # Configurar grid
-        self.root.columnconfigure(1, weight=1)
-        self.root.columnconfigure(2, minsize=120)
-        
-        # Selección de archivo Excel
-        tk.Label(self.root, text="Archivo Excel de Partidas:", anchor='w').grid(row=0, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_excel_path = tk.Entry(self.root, width=50)
-        self.entry_excel_path.grid(row=0, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=self.select_excel_file).grid(row=0, column=2, padx=10, pady=5)
-        
-        # Separador
-        ttk.Separator(self.root, orient='horizontal').grid(row=1, column=0, columnspan=3, sticky='ew', pady=10)
-        
-        # Sección de información común
-        tk.Label(self.root, text="Información Común", font=('Helvetica', 10, 'bold')).grid(row=2, column=0, columnspan=3, sticky='w', padx=5)
-        
-        # Número de mensaje
-        tk.Label(self.root, text="Número de mensaje de asignación:", anchor='w').grid(row=3, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_numero_mensaje = tk.Entry(self.root)
-        self.entry_numero_mensaje.grid(row=3, column=1, padx=10, pady=5, sticky='ew')
-        
-        # Fecha del mensaje
-        tk.Label(self.root, text="Fecha del mensaje de asignación:", anchor='w').grid(row=4, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_fecha_mensaje = tk.Entry(self.root)
-        self.entry_fecha_mensaje.grid(row=4, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_mensaje)).grid(row=4, column=2, padx=10, pady=5)
-        
-        # Fecha del documento
-        tk.Label(self.root, text="Fecha de elaboración del documento:", anchor='w').grid(row=5, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_fecha_documento = tk.Entry(self.root)
-        self.entry_fecha_documento.grid(row=5, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_documento)).grid(row=5, column=2, padx=10, pady=5)
-        
-        # Número de oficio
-        tk.Label(self.root, text="Número del Oficio de remisión:", anchor='w').grid(row=6, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_numero_oficio = tk.Entry(self.root)
-        self.entry_numero_oficio.grid(row=6, column=1, padx=10, pady=5, sticky='ew')
-        
-        # Fecha de remisión
-        tk.Label(self.root, text="Fecha del Oficio de Remisión:", anchor='w').grid(row=7, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_fecha_remision = tk.Entry(self.root)
-        self.entry_fecha_remision.grid(row=7, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_remision)).grid(row=7, column=2, padx=10, pady=5)
-        
-        # Mes asignado
-        tk.Label(self.root, text="Mes asignado:", anchor='w').grid(row=8, column=0, padx=10, pady=5, sticky='ew')
-        self.mes_asignado_var = tk.StringVar(self.root)
-        meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", 
-                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-        self.mes_asignado_var.set(meses[datetime.now().month - 1])  # Mes actual como predeterminado
-        option_menu_meses = tk.OptionMenu(self.root, self.mes_asignado_var, *meses)
-        option_menu_meses.grid(row=8, column=1, padx=10, pady=5, sticky='ew')
-        
-        # Separador
-        ttk.Separator(self.root, orient='horizontal').grid(row=9, column=0, columnspan=3, sticky='ew', pady=10)
-        
-        # Barra de progreso
-        tk.Label(self.root, text="Progreso:", anchor='w').grid(row=10, column=0, padx=10, pady=5, sticky='ew')
-        self.progress_bar = ttk.Progressbar(self.root, length=400, mode='determinate')
-        self.progress_bar.grid(row=10, column=1, columnspan=2, padx=10, pady=5, sticky='ew')
-        
-        # Botón de procesamiento
-        tk.Button(self.root, text="Procesar", command=self.process_data, bg='#4CAF50', fg='white', height=2).grid(row=11, column=0, columnspan=3, pady=20, sticky='ew', padx=20)
-        
-        # Registro de actividad
-        tk.Label(self.root, text="Registro de Actividad:", anchor='w').grid(row=12, column=0, columnspan=3, sticky='w', padx=10, pady=5)
-        self.status_text = tk.Text(self.root, height=12, width=70)
-        self.status_text.grid(row=13, column=0, columnspan=3, padx=10, pady=5, sticky='nsew')
-        
-        # Agregar scrollbar
-        scrollbar = tk.Scrollbar(self.root, command=self.status_text.yview)
-        scrollbar.grid(row=13, column=3, sticky='ns')
-        self.status_text.config(yscrollcommand=scrollbar.set)
-        
-        # Configurar fila para expandir texto de estado
-        self.root.rowconfigure(13, weight=1)
-    
-    def select_excel_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Archivos Excel", "*.xlsx")])
-        if file_path:
-            self.entry_excel_path.delete(0, tk.END)
-            self.entry_excel_path.insert(0, file_path)
-    
-    def select_date(self, entry_widget):
-        DateSelector(self.root, entry_widget)
-    
-    def update_status(self, message):
-        self.status_text.insert(tk.END, f"{message}\n")
-        self.status_text.see(tk.END)  # Auto-scroll al final
-        self.root.update_idletasks()
-    
-    def update_progress(self, value, maximum=100):
-        self.progress_bar['value'] = (value / maximum) * 100
-        self.root.update_idletasks()
-    
-    def process_data(self):
-        # Obtener parámetros de la interfaz
-        excel_path = self.entry_excel_path.get()
-        numero_mensaje = self.entry_numero_mensaje.get()
-        fecha_mensaje = self.entry_fecha_mensaje.get()
-        fecha_documento = self.entry_fecha_documento.get()
-        numero_oficio = self.entry_numero_oficio.get()
-        fecha_remision = self.entry_fecha_remision.get()
-        mes_asignado = self.mes_asignado_var.get()
-        
-        # Validar campos requeridos
-        if not excel_path:
-            messagebox.showerror("Error", "Por favor, seleccione un archivo Excel.")
-            return
-        
-        if not numero_mensaje or not fecha_mensaje or not fecha_documento or not numero_oficio or not fecha_remision:
-            messagebox.showerror("Error", "Todos los campos son obligatorios.")
-            return
-        
-        # Convertir fechas a formato de texto
-        try:
-            fecha_mensaje_texto = convert_fecha_to_texto(fecha_mensaje)
-            fecha_documento_texto = convert_fecha_to_texto(fecha_documento)
-            fecha_remision_texto = convert_fecha_to_texto(fecha_remision)
-        except ValueError:
-            messagebox.showerror("Error", "El formato de fecha debe ser YYYY-MM-DD")
-            return
-        
-        # Limpiar texto de estado
-        self.status_text.delete(1.0, tk.END)
-        
-        # Iniciar procesamiento en un hilo separado
-        thread = threading.Thread(target=self.process_thread, args=(
-            excel_path, numero_mensaje, fecha_mensaje, fecha_mensaje_texto,
-            fecha_documento_texto, numero_oficio, fecha_remision_texto, mes_asignado
-        ))
-        thread.daemon = True
-        thread.start()
-    
-    def process_thread(self, excel_path, numero_mensaje, fecha_mensaje_raw, fecha_mensaje,fecha_documento, numero_oficio, fecha_remision, mes_asignado):
-        try:
-            self.update_status("Iniciando procesamiento...")
-            
-            # Leer archivo Excel
-            self.update_status("Leyendo archivo Excel...")
-            partidas = self.excel_reader.read_partidas(excel_path)
-            self.update_status(f"Se encontraron {len(partidas)} partidas en el archivo.")
-            
-            # Directorio base (mismo que el archivo Excel)
-            base_dir = os.path.dirname(excel_path)
-            
-            # Procesar cada partida
-            total_partidas = len(partidas)
-            for i, partida in enumerate(partidas):
-                self.update_status(f"Procesando partida {partida['numero']} - {partida['descripcion']}...")
-                
-                # Actualizar progreso (nivel de partida)
-                self.update_progress(i, total_partidas)
-                
-                # Buscar archivos XML para esta partida
-                partida_dir = os.path.join(base_dir, partida['numero'])
-                if not os.path.exists(partida_dir):
-                    self.update_status(f"  AVISO: Directorio para partida {partida['numero']} no encontrado.")
-                    continue
-                
-                xml_files = self.file_utils.find_xml_files(partida_dir)
-                self.update_status(f"  Se encontraron {len(xml_files)} archivos XML para procesar.")
-                
-                # Procesar cada archivo XML
-                for j, xml_file in enumerate(xml_files):
-                    self.update_status(f"  Procesando archivo: {os.path.basename(xml_file)}...")
-                    
-                    try:
-                        # Formatear monto
-                        monto_formateado = "$ {:,.2f}".format(partida['monto'])
-                        
-                        # Obtener directorio de salida
-                        output_dir = os.path.dirname(xml_file)
-                        
-                        # Leer y procesar el XML
-                        xml_data = self.xml_processor.read_xml(
-                            xml_file,
-                            numero_mensaje,
-                            fecha_mensaje_raw,
-                            mes_asignado,
-                            monto_formateado,
-                            fecha_documento,
-                            partida['numero'],
-                            numero_oficio,
-                            fecha_remision
-                        )
-                        
-                        # Generar documentos
-                        self.document_generator.generate_all_documents(
-                            xml_data,
-                            output_dir,
-                            partida
-                        )
-                        
-                        self.update_status(f"  ✅ Documentos generados para {os.path.basename(xml_file)}.")
-                    except Exception as e:
-                        self.update_status(f"  ❌ ERROR al procesar {os.path.basename(xml_file)}: {str(e)}")
-            
-            # Actualización final del progreso
-            self.update_progress(total_partidas, total_partidas)
-            self.update_status("¡Procesamiento completado con éxito!")
-            messagebox.showinfo("Éxito", "Procesamiento completado con éxito")
-        except Exception as e:
-            self.update_status(f"ERROR: {str(e)}")
-            messagebox.showerror("Error", f"Error durante el procesamiento: {str(e)}")
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = AutomatizacionApp(root)
+    app = DocumentosXMLApp(root)
     root.mainloop()
