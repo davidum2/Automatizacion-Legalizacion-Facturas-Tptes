@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
-def descargar_verificacion(data, carpeta_contenedora):
+def descargarVerificacion(data, carpeta_contenedora):
     """
     Descarga la verificación del SAT para una factura.
     

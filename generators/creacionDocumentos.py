@@ -3,7 +3,7 @@ from docx import Document
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-def legalizacionFactura(template_path, output_dir, data):
+def creacionDocumentos(template_path,output_dir, data, template_name):
     """
     Crea un documento de legalización de factura basado en una plantilla.
     
@@ -16,6 +16,9 @@ def legalizacionFactura(template_path, output_dir, data):
         str: Ruta al documento generado
     """
     try:
+
+        
+
         # Verificar que la plantilla existe
         if not os.path.exists(template_path):
             raise FileNotFoundError(f"No se encontró la plantilla: {template_path}")
@@ -23,9 +26,20 @@ def legalizacionFactura(template_path, output_dir, data):
         # Cargar la plantilla
         doc = Document(template_path)
         
+
+        def formatear_combustible(diccionario):
+            if 'Diesel' in diccionario:
+                return f"{diccionario['Diesel']} Lts. de diesel"
+            elif 'Gasolina' in diccionario:
+                return f"{diccionario['Gasolina']} Lts. de gasolina"
+            else:
+                return "Tipo de combustible no reconocido"
+
         # Buscar marcadores en el documento y reemplazarlos con los datos
         for paragraph in doc.paragraphs:
             # Reemplazar marcadores en el texto del párrafo
+            if '{{XML}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{XML}}', data['xml'])
             if '{{FECHA_DOCUMENTO}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{FECHA_DOCUMENTO}}', data['Fecha_doc'])
             if '{{SERIE_NUMERO}}' in paragraph.text:
@@ -37,15 +51,25 @@ def legalizacionFactura(template_path, output_dir, data):
             if '{{MONTO}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{MONTO}}', data['monto'])
             if '{{EMPLEO_RECURSO}}' in paragraph.text:
-                paragraph.text = paragraph.text.replace('{{EMPLEO_RECURSO}}', data['Empleo_recurso'])
-            if '{{NO_PARTIDA}}' in paragraph.text:
-                paragraph.text = paragraph.text.replace('{{NO_PARTIDA}}', data['No_partida'])
+                paragraph.text = paragraph.text.replace('{{EMPLEO_RECURSO}}', formatear_combustible(data['Conceptos']))
             if '{{MES}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{MES}}', data['Mes'])
             if '{{NO_MENSAJE}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{NO_MENSAJE}}', data['No_mensaje'])
             if '{{FECHA_MENSAJE}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{FECHA_MENSAJE}}', data['Fecha_mensaje'])
+            if '{{GRADO_RECIBIO_LA_COMPRA}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{GRADO_RECIBIO_LA_COMPRA}}', data['Grado_recibio_la_compra'])
+            if '{{NOMBRE_RECIBIO_LA_COMPRA}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{NOMBRE_RECIBIO_LA_COMPRA}}', data['Nombre_recibio_la_compra'])
+            if '{{MATRICULA_RECIBIO_LA_COMPRA}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{MATRICULA_RECIBIO_LA_COMPRA}}', data['Matricula_recibio_la_compra'])
+            if '{{GRADO_VO_BO}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{GRADO_VO_BO}}', data['Grado_Vo_Bo'])
+            if '{{NOMBRE_VO_BO}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{NOMBRE_VO_BO}}', data['Nombre_Vo_Bo'])
+            if '{{MATRICULA_VO_BO}}' in paragraph.text:
+                paragraph.text = paragraph.text.replace('{{MATRICULA_VO_BO}}', data['Matricula_Vo_Bo'])
         
         # También buscar en las tablas
         for table in doc.tables:
@@ -64,17 +88,28 @@ def legalizacionFactura(template_path, output_dir, data):
                             paragraph.text = paragraph.text.replace('{{MONTO}}', data['monto'])
                         if '{{EMPLEO_RECURSO}}' in paragraph.text:
                             paragraph.text = paragraph.text.replace('{{EMPLEO_RECURSO}}', data['Empleo_recurso'])
-                        if '{{NO_PARTIDA}}' in paragraph.text:
-                            paragraph.text = paragraph.text.replace('{{NO_PARTIDA}}', data['No_partida'])
+                        if '{{GRADO_VO_BO}}' in paragraph.text:
+                            paragraph.text = paragraph.text.replace('{{GRADO_VO_BO}}', data['Grado_Vo_Bo'])
+                        if '{{NOMBRE_VO_BO}}' in paragraph.text:
+                            paragraph.text = paragraph.text.replace('{{NOMBRE_VO_BO}}', data['Nombre_Vo_Bo'])
+                        if '{{MATRICULA_VO_BO}}' in paragraph.text:
+                            paragraph.text = paragraph.text.replace('{{MATRICULA_VO_BO}}', data['Matricula_Vo_Bo'])
                         if '{{MES}}' in paragraph.text:
                             paragraph.text = paragraph.text.replace('{{MES}}', data['Mes'])
                         if '{{NO_MENSAJE}}' in paragraph.text:
                             paragraph.text = paragraph.text.replace('{{NO_MENSAJE}}', data['No_mensaje'])
                         if '{{FECHA_MENSAJE}}' in paragraph.text:
                             paragraph.text = paragraph.text.replace('{{FECHA_MENSAJE}}', data['Fecha_mensaje'])
+                        if '{{GRADO_RECIBIO_LA_COMPRA}}' in paragraph.text:
+                            paragraph.text = paragraph.text.replace('{{GRADO_RECIBIO_LA_COMPRA}}', data['Grado_recibio_la_compra'])
+                        if '{{NOMBRE_RECIBIO_LA_COMPRA}}' in paragraph.text:
+                            paragraph.text = paragraph.text.replace('{{NOMBRE_RECIBIO_LA_COMPRA}}', data['Nombre_recibio_la_compra'])
+                        if '{{MATRICULA_RECIBIO_LA_COMPRA}}' in paragraph.text:
+                            paragraph.text = paragraph.text.replace('{{MATRICULA_RECIBIO_LA_COMPRA}}', data['Matricula_recibio_la_compra'])
+                        
         
         # Guardar el documento
-        output_path = os.path.join(output_dir, "legalizacion_factura.docx")
+        output_path = os.path.join(output_dir, template_name+ ".docx")
         doc.save(output_path)
         
         return output_path

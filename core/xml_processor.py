@@ -10,7 +10,7 @@ class XMLProcessor:
     """
     
     def read_xml(self, file_path, numero_mensaje, fecha_mensaje_asignacion, 
-                mes_asignado, monto_asignado, fecha_documento, fecha_remision):
+                mes_asignado, monto_asignado, fecha_documento):
         """
         Lee y analiza un archivo XML para extraer información relevante.
         

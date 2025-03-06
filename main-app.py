@@ -12,6 +12,12 @@ from utils.formatters import convert_fecha_to_texto
 
 class DocumentosXMLApp:
     def __init__(self, root):
+        """
+        Inicializa la aplicación para generar documentos desde XML.
+        
+        Args:
+            root: Ventana principal de Tkinter
+        """
         self.root = root
         self.root.title("Generador de Documentos desde XML")
         self.root.geometry("800x700")
@@ -25,20 +31,44 @@ class DocumentosXMLApp:
         self.create_widgets()
     
     def create_widgets(self):
+        """Crea y configura todos los widgets de la interfaz de usuario."""
         # Configurar grid
         self.root.columnconfigure(1, weight=1)
         self.root.columnconfigure(2, minsize=120)
         
-        # Selección de archivo XML
-        tk.Label(self.root, text="Archivo XML de Factura:", anchor='w').grid(row=0, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_xml_path = tk.Entry(self.root, width=50)
-        self.entry_xml_path.grid(row=0, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=self.select_xml_file).grid(row=0, column=2, padx=10, pady=5)
+        # ==== SECCIÓN DE SELECCIÓN DE ARCHIVO XML ====
+        self._create_xml_file_selection_section()
         
         # Separador
         ttk.Separator(self.root, orient='horizontal').grid(row=1, column=0, columnspan=3, sticky='ew', pady=10)
         
-        # Sección de información común
+        # ==== SECCIÓN DE INFORMACIÓN DEL DOCUMENTO ====
+        self._create_document_info_section()
+        
+        # Separador
+        ttk.Separator(self.root, orient='horizontal').grid(row=8, column=0, columnspan=3, sticky='ew', pady=10)
+        
+        # ==== SECCIÓN DE INFORMACIÓN DEL PERSONAL ====
+        self._create_personnel_section()
+        
+        # Separador
+        ttk.Separator(self.root, orient='horizontal').grid(row=13, column=0, columnspan=3, sticky='ew', pady=10)
+        
+        # ==== SECCIÓN DE PROGRESO Y PROCESAMIENTO ====
+        self._create_progress_section()
+        
+        # ==== SECCIÓN DE REGISTRO DE ACTIVIDAD ====
+        self._create_activity_log_section()
+    
+    def _create_xml_file_selection_section(self):
+        """Crea la sección para seleccionar el archivo XML."""
+        tk.Label(self.root, text="Archivo XML de Factura:", anchor='w').grid(row=0, column=0, padx=10, pady=5, sticky='ew')
+        self.entry_ruta_xml = tk.Entry(self.root, width=50)
+        self.entry_ruta_xml.grid(row=0, column=1, padx=10, pady=5, sticky='ew')
+        tk.Button(self.root, text="Seleccionar", command=self.seleccionar_archivo_xml).grid(row=0, column=2, padx=10, pady=5)
+    
+    def _create_document_info_section(self):
+        """Crea la sección de información del documento."""
         tk.Label(self.root, text="Información del Documento", font=('Helvetica', 10, 'bold')).grid(row=2, column=0, columnspan=3, sticky='w', padx=5)
         
         # Número de mensaje
@@ -50,36 +80,34 @@ class DocumentosXMLApp:
         tk.Label(self.root, text="Fecha del mensaje de asignación:", anchor='w').grid(row=4, column=0, padx=10, pady=5, sticky='ew')
         self.entry_fecha_mensaje = tk.Entry(self.root)
         self.entry_fecha_mensaje.grid(row=4, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_mensaje)).grid(row=4, column=2, padx=10, pady=5)
+        tk.Button(self.root, text="Seleccionar", command=lambda: self.seleccionar_fecha(self.entry_fecha_mensaje)).grid(row=4, column=2, padx=10, pady=5)
         
         # Monto asignado
         tk.Label(self.root, text="Monto asignado:", anchor='w').grid(row=5, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_monto = tk.Entry(self.root)
-        self.entry_monto.grid(row=5, column=1, padx=10, pady=5, sticky='ew')
+        self.entry_monto_asignado = tk.Entry(self.root)
+        self.entry_monto_asignado.grid(row=5, column=1, padx=10, pady=5, sticky='ew')
         
         # Fecha del documento
         tk.Label(self.root, text="Fecha de elaboración del documento:", anchor='w').grid(row=6, column=0, padx=10, pady=5, sticky='ew')
-        self.entry_fecha_documento = tk.Entry(self.root)
-        self.entry_fecha_documento.grid(row=6, column=1, padx=10, pady=5, sticky='ew')
-        tk.Button(self.root, text="Seleccionar", command=lambda: self.select_date(self.entry_fecha_documento)).grid(row=6, column=2, padx=10, pady=5)
+        self.entry_fecha_elaboracion = tk.Entry(self.root)
+        self.entry_fecha_elaboracion.grid(row=6, column=1, padx=10, pady=5, sticky='ew')
+        tk.Button(self.root, text="Seleccionar", command=lambda: self.seleccionar_fecha(self.entry_fecha_elaboracion)).grid(row=6, column=2, padx=10, pady=5)
         
         # Mes asignado
         tk.Label(self.root, text="Mes de comprobación:", anchor='w').grid(row=7, column=0, padx=10, pady=5, sticky='ew')
-        self.mes_asignado_var = tk.StringVar(self.root)
+        self.combo_mes_comprobacion = tk.StringVar(self.root)
         meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", 
                 "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-        self.mes_asignado_var.set(meses[datetime.now().month - 1])  # Mes actual como predeterminado
-        option_menu_meses = tk.OptionMenu(self.root, self.mes_asignado_var, *meses)
+        self.combo_mes_comprobacion.set(meses[datetime.now().month - 1])  # Mes actual como predeterminado
+        option_menu_meses = tk.OptionMenu(self.root, self.combo_mes_comprobacion, *meses)
         option_menu_meses.grid(row=7, column=1, padx=10, pady=5, sticky='ew')
-        
-        # Separador
-        ttk.Separator(self.root, orient='horizontal').grid(row=8, column=0, columnspan=3, sticky='ew', pady=10)
-        
-        # Sección de personal
+    
+    def _create_personnel_section(self):
+        """Crea la sección de información del personal."""
         tk.Label(self.root, text="Información del Personal", font=('Helvetica', 10, 'bold')).grid(row=9, column=0, columnspan=3, sticky='w', padx=5)
         
         # Define el personal estructurado
-        self.personal_recibe_data = [
+        self.lista_personal_recibe = [
             {
                 'Grado_recibio_la_compra': "Cap. Enc. Tptes", 
                 'Nombre_recibio_la_compra': "Juan Pérez Rodríguez",
@@ -97,7 +125,7 @@ class DocumentosXMLApp:
             }
         ]
         
-        self.personal_visto_bueno_data = [
+        self.lista_personal_visto_bueno = [
             {
                 'Grado_Vo_Bo': "Cor. Inf.", 
                 'Nombre_Vo_Bo': "Roberto Sánchez Torres",
@@ -117,162 +145,173 @@ class DocumentosXMLApp:
         
         # Persona que recibe la compra
         tk.Label(self.root, text="Recibió la compra:", anchor='w').grid(row=10, column=0, padx=10, pady=5, sticky='ew')
-        self.recibe_compra_index = tk.IntVar(self.root, value=0)
+        self.indice_persona_recibe = tk.IntVar(self.root, value=0)
         
         # Crear descripciones para mostrar en el menú
-        personal_recibe_display = []
-        for persona in self.personal_recibe_data:
-            display = f"{persona['Grado_recibio_la_compra']} {persona['Nombre_recibio_la_compra']} ({persona['Matricula_recibio_la_compra']})"
-            personal_recibe_display.append(display)
+        etiquetas_personal_recibe = []
+        for persona in self.lista_personal_recibe:
+            etiqueta = f"{persona['Grado_recibio_la_compra']} {persona['Nombre_recibio_la_compra']} ({persona['Matricula_recibio_la_compra']})"
+            etiquetas_personal_recibe.append(etiqueta)
         
         # Función para actualizar el índice cuando se selecciona una opción
-        def on_recibe_select(*args):
-            self.show_selected_personal_info()
+        def al_seleccionar_receptor(*args):
+            self.mostrar_info_personal_seleccionado()
         
-        option_menu_recibe = tk.OptionMenu(self.root, self.recibe_compra_index, *range(len(personal_recibe_display)), 
-                                          command=on_recibe_select)
-        option_menu_recibe.grid(row=10, column=1, padx=10, pady=5, sticky='ew')
+        dropdown_receptor = tk.OptionMenu(self.root, self.indice_persona_recibe, 
+                                           *range(len(etiquetas_personal_recibe)), 
+                                           command=al_seleccionar_receptor)
+        dropdown_receptor.grid(row=10, column=1, padx=10, pady=5, sticky='ew')
         
         # Actualizar el texto del menú
-        menu = option_menu_recibe['menu']
+        menu = dropdown_receptor['menu']
         menu.delete(0, 'end')
-        for i, display in enumerate(personal_recibe_display):
-            menu.add_command(label=display, command=tk._setit(self.recibe_compra_index, i, on_recibe_select))
+        for i, etiqueta in enumerate(etiquetas_personal_recibe):
+            menu.add_command(label=etiqueta, 
+                            command=tk._setit(self.indice_persona_recibe, i, al_seleccionar_receptor))
         
         # Persona que da visto bueno
         tk.Label(self.root, text="Visto bueno:", anchor='w').grid(row=11, column=0, padx=10, pady=5, sticky='ew')
-        self.visto_bueno_index = tk.IntVar(self.root, value=0)
+        self.indice_persona_visto_bueno = tk.IntVar(self.root, value=0)
         
         # Crear descripciones para mostrar en el menú
-        personal_visto_bueno_display = []
-        for persona in self.personal_visto_bueno_data:
-            display = f"{persona['Grado_Vo_Bo']} {persona['Nombre_Vo_Bo']} ({persona['Matricula_Vo_Bo']})"
-            personal_visto_bueno_display.append(display)
+        etiquetas_personal_visto_bueno = []
+        for persona in self.lista_personal_visto_bueno:
+            etiqueta = f"{persona['Grado_Vo_Bo']} {persona['Nombre_Vo_Bo']} ({persona['Matricula_Vo_Bo']})"
+            etiquetas_personal_visto_bueno.append(etiqueta)
         
         # Función para actualizar el índice cuando se selecciona una opción
-        def on_visto_bueno_select(*args):
-            self.show_selected_personal_info()
+        def al_seleccionar_visto_bueno(*args):
+            self.mostrar_info_personal_seleccionado()
         
-        option_menu_visto_bueno = tk.OptionMenu(self.root, self.visto_bueno_index, *range(len(personal_visto_bueno_display)), 
-                                               command=on_visto_bueno_select)
-        option_menu_visto_bueno.grid(row=11, column=1, padx=10, pady=5, sticky='ew')
+        dropdown_visto_bueno = tk.OptionMenu(self.root, self.indice_persona_visto_bueno, 
+                                              *range(len(etiquetas_personal_visto_bueno)), 
+                                              command=al_seleccionar_visto_bueno)
+        dropdown_visto_bueno.grid(row=11, column=1, padx=10, pady=5, sticky='ew')
         
         # Actualizar el texto del menú
-        menu = option_menu_visto_bueno['menu']
+        menu = dropdown_visto_bueno['menu']
         menu.delete(0, 'end')
-        for i, display in enumerate(personal_visto_bueno_display):
-            menu.add_command(label=display, command=tk._setit(self.visto_bueno_index, i, on_visto_bueno_select))
+        for i, etiqueta in enumerate(etiquetas_personal_visto_bueno):
+            menu.add_command(label=etiqueta, 
+                            command=tk._setit(self.indice_persona_visto_bueno, i, 
+                                            al_seleccionar_visto_bueno))
         
         # Añadir área para mostrar información del personal seleccionado
-        self.info_frame = tk.LabelFrame(self.root, text="Información del Personal Seleccionado")
-        self.info_frame.grid(row=12, column=0, columnspan=3, padx=10, pady=5, sticky='ew')
+        self.frame_info_personal = tk.LabelFrame(self.root, text="Información del Personal Seleccionado")
+        self.frame_info_personal.grid(row=12, column=0, columnspan=3, padx=10, pady=5, sticky='ew')
         
-        self.info_text = tk.Text(self.info_frame, height=5, width=70)
-        self.info_text.pack(padx=5, pady=5, fill='both', expand=True)
+        self.texto_info_personal = tk.Text(self.frame_info_personal, height=5, width=70)
+        self.texto_info_personal.pack(padx=5, pady=5, fill='both', expand=True)
         
-        # Mostrar la información inicial
-        self.show_selected_personal_info()
-        
-        # Separador
-        ttk.Separator(self.root, orient='horizontal').grid(row=13, column=0, columnspan=3, sticky='ew', pady=10)
-        
-        # Barra de progreso
+    
+    
+    def _create_progress_section(self):
+        """Crea la sección de progreso y botón de procesamiento."""
         tk.Label(self.root, text="Progreso:", anchor='w').grid(row=14, column=0, padx=10, pady=5, sticky='ew')
-        self.progress_bar = ttk.Progressbar(self.root, length=400, mode='determinate')
-        self.progress_bar.grid(row=14, column=1, columnspan=2, padx=10, pady=5, sticky='ew')
+        self.barra_progreso = ttk.Progressbar(self.root, length=400, mode='determinate')
+        self.barra_progreso.grid(row=14, column=1, columnspan=2, padx=10, pady=5, sticky='ew')
         
         # Botón de procesamiento
-        tk.Button(self.root, text="Procesar", command=self.process_data, bg='#4CAF50', fg='white', height=2).grid(row=15, column=0, columnspan=3, pady=20, sticky='ew', padx=20)
-        
-        # Registro de actividad
+        tk.Button(self.root, text="Procesar", command=self.procesar_datos, 
+                 bg='#4CAF50', fg='white', height=2).grid(row=15, column=0, 
+                                                       columnspan=3, pady=20, 
+                                                       sticky='ew', padx=20)
+    
+    def _create_activity_log_section(self):
+        """Crea la sección de registro de actividad."""
         tk.Label(self.root, text="Registro de Actividad:", anchor='w').grid(row=16, column=0, columnspan=3, sticky='w', padx=10, pady=5)
-        self.status_text = tk.Text(self.root, height=12, width=70)
-        self.status_text.grid(row=17, column=0, columnspan=3, padx=10, pady=5, sticky='nsew')
+        self.texto_registro_actividad = tk.Text(self.root, height=12, width=70)
+        self.texto_registro_actividad.grid(row=17, column=0, columnspan=3, padx=10, pady=5, sticky='nsew')
         
         # Agregar scrollbar
-        scrollbar = tk.Scrollbar(self.root, command=self.status_text.yview)
+        scrollbar = tk.Scrollbar(self.root, command=self.texto_registro_actividad.yview)
         scrollbar.grid(row=17, column=3, sticky='ns')
-        self.status_text.config(yscrollcommand=scrollbar.set)
+        self.texto_registro_actividad.config(yscrollcommand=scrollbar.set)
         
         # Configurar fila para expandir texto de estado
         self.root.rowconfigure(17, weight=1)
     
-    def show_selected_personal_info(self):
+
         """
         Muestra la información del personal seleccionado en el área de información.
         """
         # Limpiar el área de texto
-        self.info_text.delete(1.0, tk.END)
+        self.texto_info_personal.delete(1.0, tk.END)
         
         # Obtener la información del personal seleccionado
-        recibe_index = self.recibe_compra_index.get()
-        visto_bueno_index = self.visto_bueno_index.get()
+        indice_receptor = self.indice_persona_recibe.get()
+        indice_visto_bueno = self.indice_persona_visto_bueno.get()
         
-        recibe_info = self.personal_recibe_data[recibe_index]
-        visto_bueno_info = self.personal_visto_bueno_data[visto_bueno_index]
+        info_receptor = self.lista_personal_recibe[indice_receptor]
+        info_visto_bueno = self.lista_personal_visto_bueno[indice_visto_bueno]
         
         # Mostrar información estructurada
         info_text = "recibeCompra={\n"
-        info_text += f"    Grado_recibio_la_compra: \"{recibe_info['Grado_recibio_la_compra']}\",\n"
-        info_text += f"    Nombre_recibio_la_compra: \"{recibe_info['Nombre_recibio_la_compra']}\",\n"
-        info_text += f"    Matricula_recibio_la_compra: \"{recibe_info['Matricula_recibio_la_compra']}\"\n"
+        info_text += f"    Grado_recibio_la_compra: \"{info_receptor['Grado_recibio_la_compra']}\",\n"
+        info_text += f"    Nombre_recibio_la_compra: \"{info_receptor['Nombre_recibio_la_compra']}\",\n"
+        info_text += f"    Matricula_recibio_la_compra: \"{info_receptor['Matricula_recibio_la_compra']}\"\n"
         info_text += "}\n\n"
         
         info_text += "vistoBueno={\n"
-        info_text += f"    Grado_Vo_Bo: \"{visto_bueno_info['Grado_Vo_Bo']}\",\n"
-        info_text += f"    Nombre_Vo_Bo: \"{visto_bueno_info['Nombre_Vo_Bo']}\",\n"
-        info_text += f"    Matricula_Vo_Bo: \"{visto_bueno_info['Matricula_Vo_Bo']}\"\n"
+        info_text += f"    Grado_Vo_Bo: \"{info_visto_bueno['Grado_Vo_Bo']}\",\n"
+        info_text += f"    Nombre_Vo_Bo: \"{info_visto_bueno['Nombre_Vo_Bo']}\",\n"
+        info_text += f"    Matricula_Vo_Bo: \"{info_visto_bueno['Matricula_Vo_Bo']}\"\n"
         info_text += "}"
         
-        self.info_text.insert(tk.END, info_text)
+        self.texto_info_personal.insert(tk.END, info_text)
     
-    def select_xml_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Archivos XML", "*.xml")])
-        if file_path:
-            self.entry_xml_path.delete(0, tk.END)
-            self.entry_xml_path.insert(0, file_path)
+    def seleccionar_archivo_xml(self):
+        """Abre un diálogo para seleccionar un archivo XML."""
+        ruta_archivo = filedialog.askopenfilename(filetypes=[("Archivos XML", "*.xml")])
+        if ruta_archivo:
+            self.entry_ruta_xml.delete(0, tk.END)
+            self.entry_ruta_xml.insert(0, ruta_archivo)
     
-    def select_date(self, entry_widget):
-        DateSelector(self.root, entry_widget)
+    def seleccionar_fecha(self, campo_entrada):
+        """Abre el selector de fechas para un campo de entrada."""
+        DateSelector(self.root, campo_entrada)
     
-    def update_status(self, message):
-        self.status_text.insert(tk.END, f"{message}\n")
-        self.status_text.see(tk.END)  # Auto-scroll al final
+    def actualizar_registro(self, mensaje):
+        """Actualiza el registro de actividad con un nuevo mensaje."""
+        self.texto_registro_actividad.insert(tk.END, f"{mensaje}\n")
+        self.texto_registro_actividad.see(tk.END)  # Auto-scroll al final
         self.root.update_idletasks()
     
-    def update_progress(self, value, maximum=100):
-        self.progress_bar['value'] = (value / maximum) * 100
+    def actualizar_progreso(self, valor, maximo=100):
+        """Actualiza la barra de progreso."""
+        self.barra_progreso['value'] = (valor / maximo) * 100
         self.root.update_idletasks()
     
-    def process_data(self):
+    def procesar_datos(self):
+        """Procesa los datos ingresados en la interfaz."""
         # Obtener parámetros de la interfaz
-        xml_path = self.entry_xml_path.get()
+        ruta_xml = self.entry_ruta_xml.get()
         numero_mensaje = self.entry_numero_mensaje.get()
         fecha_mensaje = self.entry_fecha_mensaje.get()
-        monto_asignado = self.entry_monto.get()
-        fecha_documento = self.entry_fecha_documento.get()
-        mes_asignado = self.mes_asignado_var.get()
+        monto_asignado = self.entry_monto_asignado.get()
+        fecha_elaboracion = self.entry_fecha_elaboracion.get()
+        mes_comprobacion = self.combo_mes_comprobacion.get()
         
         # Obtener información del personal seleccionado
-        recibe_index = self.recibe_compra_index.get()
-        visto_bueno_index = self.visto_bueno_index.get()
+        indice_receptor = self.indice_persona_recibe.get()
+        indice_visto_bueno = self.indice_persona_visto_bueno.get()
         
-        recibe_info = self.personal_recibe_data[recibe_index]
-        visto_bueno_info = self.personal_visto_bueno_data[visto_bueno_index]
+        info_receptor = self.lista_personal_recibe[indice_receptor]
+        info_visto_bueno = self.lista_personal_visto_bueno[indice_visto_bueno]
         
         # Validar campos requeridos
-        if not xml_path:
+        if not ruta_xml:
             messagebox.showerror("Error", "Por favor, seleccione un archivo XML.")
             return
         
-        if not numero_mensaje or not fecha_mensaje or not monto_asignado or not fecha_documento:
+        if not numero_mensaje or not fecha_mensaje or not monto_asignado or not fecha_elaboracion:
             messagebox.showerror("Error", "Todos los campos de información son obligatorios.")
             return
         
         # Convertir fechas a formato de texto
         try:
             fecha_mensaje_texto = convert_fecha_to_texto(fecha_mensaje)
-            fecha_documento_texto = convert_fecha_to_texto(fecha_documento)
+            fecha_elaboracion_texto = convert_fecha_to_texto(fecha_elaboracion)
         except ValueError:
             messagebox.showerror("Error", "El formato de fecha debe ser YYYY-MM-DD")
             return
@@ -287,91 +326,102 @@ class DocumentosXMLApp:
             messagebox.showerror("Error", "El monto debe ser un número válido")
             return
         
-        # Limpiar texto de estado
-        self.status_text.delete(1.0, tk.END)
+        # Limpiar texto de registro
+        self.texto_registro_actividad.delete(1.0, tk.END)
         
-        # Llamar directamente a la función de procesamiento
-        self.process_file(
-            xml_path, numero_mensaje, fecha_mensaje, fecha_mensaje_texto,
-            fecha_documento_texto, monto_formateado, mes_asignado,
-            recibe_info, visto_bueno_info
+        # Llamar a la función de procesamiento
+        self.procesar_archivo(
+            ruta_xml, 
+            numero_mensaje, 
+            fecha_mensaje, 
+            fecha_mensaje_texto,
+            fecha_elaboracion_texto, 
+            monto_formateado, 
+            mes_comprobacion,
+            info_receptor, 
+            info_visto_bueno
         )
     
-    def process_file(self, xml_path, numero_mensaje, fecha_mensaje_raw, fecha_mensaje,
-                      fecha_documento, monto_formateado, mes_asignado,
-                      recibe_info, visto_bueno_info):
+    def procesar_archivo(self, ruta_xml, numero_mensaje, fecha_mensaje_original, 
+                      fecha_mensaje_formateada, fecha_elaboracion_formateada, 
+                      monto_formateado, mes_comprobacion, info_receptor, 
+                      info_visto_bueno):
+        """
+        Procesa un archivo XML y genera los documentos correspondientes.
+        
+        Args:
+            ruta_xml: Ruta al archivo XML
+            numero_mensaje: Número del mensaje de asignación
+            fecha_mensaje_original: Fecha del mensaje en formato original
+            fecha_mensaje_formateada: Fecha del mensaje formateada en texto
+            fecha_elaboracion_formateada: Fecha de elaboración formateada en texto
+            monto_formateado: Monto formateado como moneda
+            mes_comprobacion: Mes de comprobación
+            info_receptor: Información de la persona que recibe
+            info_visto_bueno: Información de la persona que da visto bueno
+        """
         try:
-            self.update_status("Iniciando procesamiento...")
+            self.actualizar_registro("Iniciando procesamiento...")
             
             # Actualizar progreso
-            self.update_progress(10)
+            self.actualizar_progreso(10)
             self.root.update_idletasks()  # Actualizar la interfaz
             
             # Obtener directorio de salida (mismo directorio que el XML)
-            output_dir = os.path.dirname(xml_path)
+            directorio_salida = os.path.dirname(ruta_xml)
             
             # Procesar el archivo XML
-            self.update_status(f"Procesando archivo: {os.path.basename(xml_path)}...")
+            self.actualizar_registro(f"Procesando archivo: {os.path.basename(ruta_xml)}...")
             self.root.update_idletasks()  # Actualizar la interfaz
             
             try:
-                # Leer y procesar el XML
-                partida_numero = "00000"  # Este valor podría provenir de otro lugar
-                
-                xml_data = self.xml_processor.read_xml(
-                    xml_path,
+                             
+                datos_xml = self.xml_processor.read_xml(
+                    ruta_xml,
                     numero_mensaje,
-                    fecha_mensaje_raw,
-                    mes_asignado,
+                    fecha_mensaje_original,
+                    mes_comprobacion,
                     monto_formateado,
-                    fecha_documento,
-                    partida_numero,
-                   
+                    fecha_elaboracion_formateada,
                 )
+
+                datos_xml['Fecha_mensaje'] = fecha_mensaje_formateada
                 
-                # Agregar información de personal (ya viene estructurada correctamente)
-                # Copiar todos los campos del diccionario de quien recibe la compra
-                for key, value in recibe_info.items():
-                    xml_data[key] = value
+                # Agregar información de personal
+                for clave, valor in info_receptor.items():
+                    datos_xml[clave] = valor
                 
-                # Copiar todos los campos del diccionario de visto bueno
-                for key, value in visto_bueno_info.items():
-                    xml_data[key] = value
+                for clave, valor in info_visto_bueno.items():
+                    datos_xml[clave] = valor
                 
-                self.update_progress(40)
+                self.actualizar_progreso(40)
                 self.root.update_idletasks()  # Actualizar la interfaz
                 
                 # Generar documentos
-                self.update_status("Generando documentos...")
+                self.actualizar_registro("Generando documentos...")
                 
-                # Generar los documentos necesarios utilizando los nuevos campos de personal
+                # Generar los documentos usando el DocumentGenerator
                 self.document_generator.generate_all_documents(
-                    xml_data,
-                    output_dir,
-                    {'monto': monto_formateado}  # Simplificado ya que no usamos partidas del Excel
+                    datos_xml,
+                    directorio_salida,
                 )
                 
-                self.update_progress(90)
+                self.actualizar_progreso(90)
                 self.root.update_idletasks()  # Actualizar la interfaz
                 
-                # Descargar verificación SAT
-                self.update_status("Descargando verificación del SAT...")
-                
-                # Aquí iría el código para la verificación SAT
-                # (manteniendo la funcionalidad existente)
-                
-                self.update_progress(100)
+                # Finalizar
+                self.actualizar_progreso(100)
                 self.root.update_idletasks()  # Actualizar la interfaz
                 
-                self.update_status(f"✅ Documentos generados correctamente para {os.path.basename(xml_path)}.")
+                self.actualizar_registro(f"✅ Documentos generados correctamente para {os.path.basename(ruta_xml)}.")
                 messagebox.showinfo("Éxito", "Documentos generados correctamente")
                 
             except Exception as e:
-                self.update_status(f"❌ ERROR al procesar {os.path.basename(xml_path)}: {str(e)}")
+                self.actualizar_registro(f"❌ ERROR al procesar {os.path.basename(ruta_xml)}: {str(e)}")
                 messagebox.showerror("Error", f"Error al procesar el archivo: {str(e)}")
             
         except Exception as e:
-            self.update_status(f"ERROR: {str(e)}")
+            self.actualizar_registro(f"ERROR: {str(e)}")
             messagebox.showerror("Error", f"Error durante el procesamiento: {str(e)}")
 
 
