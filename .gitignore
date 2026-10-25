@@ -5,3 +5,17 @@ __pycache__/
 *.pyd
 *.swp
 .DS_Store
+
+# Distribucion y ejecutables
+build/
+dist/
+portable/
+installable/
+*.exe
+*.zip
+*.log
+app.log
+error.log
+test*.docx
+WEBDRIVER/
+utils/WEBDRIVER/

@@ -1,0 +1,184 @@
+<svg width="850" height="350" viewBox="0 0 850 350" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .pinnacle-rect { stroke: #333; stroke-width: 0.5; }
+        .pinnacle-main-text { font-family: 'Arial', sans-serif; font-size: 48px; font-weight: bold; text-anchor: middle; fill: #003366; }
+        .challenge-main-text { font-family: 'Arial', sans-serif; font-size: 36px; font-weight: bold; text-anchor: middle; fill: #990000; }
+        .label-text { font-family: 'Arial', sans-serif; font-size: 14px; text-anchor: middle; fill: #444; }
+        .age-text { font-family: 'Arial', sans-serif; font-size: 13px; font-weight: bold; text-anchor: middle; fill: #000; }
+        .title-text { font-family: 'Arial', sans-serif; font-size: 18px; font-weight: bold; text-anchor: middle; fill: #222; }
+
+        /* Colores para cada pináculo */
+        .p1-color { fill: #E3F2FD; /* Azul claro */ }
+        .p2-color { fill: #E0F2F1; /* Verde azulado claro */ }
+        .p3-color { fill: #FFF3E0; /* Naranja claro */ }
+        .p4-color { fill: #F3E5F5; /* Púrpura claro */ }
+    </style>
+
+    <text x="425" y="30" class="title-text">Mapa de Pináculos y Desafíos de Vida</text>
+
+    <script>
+        const yBase = 70;
+        const pinnacleHeight = 150;
+        const challengeYOffset = pinnacleHeight + 20;
+        const ageYPos = yBase + pinnacleHeight + 80;
+        const labelYOffset = 20;
+
+        const pinnacleWidths = {
+            p1: 300, // Duración 35 años
+            p2: 150,  // Duración 9 años
+            p3: 150,  // Duración 9 años
+            p4: 200  // Duración "resto de la vida", ancho representativo
+        };
+        const totalPinnacleWidth = pinnacleWidths.p1 + pinnacleWidths.p2 + pinnacleWidths.p3 + pinnacleWidths.p4;
+        const startX = (850 - totalPinnacleWidth) / 2;
+
+        let currentX = startX;
+    </script>
+
+    <rect id="p1Rect" x="0" y="0" class="pinnacle-rect p1-color" height="0" width="0"/>
+    <text id="p1Age" x="0" y="0" class="age-text">0-34 años</text>
+    <text id="p1Label" x="0" y="0" class="label-text">Pináculo 1</text>
+    <text id="p1Number" x="0" y="0" class="pinnacle-main-text">9</text>
+    <text id="c1Label" x="0" y="0" class="label-text">Desafío 1</text>
+    <text id="c1Number" x="0" y="0" class="challenge-main-text">3</text>
+    <script>
+        document.getElementById('p1Rect').setAttribute('x', currentX);
+        document.getElementById('p1Rect').setAttribute('y', yBase);
+        document.getElementById('p1Rect').setAttribute('width', pinnacleWidths.p1);
+        document.getElementById('p1Rect').setAttribute('height', pinnacleHeight + 60); // Alto para contener ambos
+
+        document.getElementById('p1Age').setAttribute('x', currentX + pinnacleWidths.p1 / 2);
+        document.getElementById('p1Age').setAttribute('y', ageYPos);
+
+        document.getElementById('p1Label').setAttribute('x', currentX + pinnacleWidths.p1 / 2);
+        document.getElementById('p1Label').setAttribute('y', yBase + labelYOffset + 10);
+        document.getElementById('p1Number').setAttribute('x', currentX + pinnacleWidths.p1 / 2);
+        document.getElementById('p1Number').setAttribute('y', yBase + labelYOffset + 60);
+
+        document.getElementById('c1Label').setAttribute('x', currentX + pinnacleWidths.p1 / 2);
+        document.getElementById('c1Label').setAttribute('y', yBase + labelYOffset + 110);
+        document.getElementById('c1Number').setAttribute('x', currentX + pinnacleWidths.p1 / 2);
+        document.getElementById('c1Number').setAttribute('y', yBase + labelYOffset + 150);
+        currentX += pinnacleWidths.p1;
+    </script>
+
+    <rect id="p2Rect" x="0" y="0" class="pinnacle-rect p2-color" height="0" width="0"/>
+    <text id="p2Age" x="0" y="0" class="age-text">35-43 años</text>
+    <text id="p2Label" x="0" y="0" class="label-text">Pináculo 2</text>
+    <text id="p2Number" x="0" y="0" class="pinnacle-main-text">7</text>
+    <text id="c2Label" x="0" y="0" class="label-text">Desafío 2</text>
+    <text id="c2Number" x="0" y="0" class="challenge-main-text">5</text>
+    <script>
+        document.getElementById('p2Rect').setAttribute('x', currentX);
+        document.getElementById('p2Rect').setAttribute('y', yBase);
+        document.getElementById('p2Rect').setAttribute('width', pinnacleWidths.p2);
+        document.getElementById('p2Rect').setAttribute('height', pinnacleHeight + 60);
+
+        document.getElementById('p2Age').setAttribute('x', currentX + pinnacleWidths.p2 / 2);
+        document.getElementById('p2Age').setAttribute('y', ageYPos);
+
+        document.getElementById('p2Label').setAttribute('x', currentX + pinnacleWidths.p2 / 2);
+        document.getElementById('p2Label').setAttribute('y', yBase + labelYOffset + 10);
+        document.getElementById('p2Number').setAttribute('x', currentX + pinnacleWidths.p2 / 2);
+        document.getElementById('p2Number').setAttribute('y', yBase + labelYOffset + 60);
+
+        document.getElementById('c2Label').setAttribute('x', currentX + pinnacleWidths.p2 / 2);
+        document.getElementById('c2Label').setAttribute('y', yBase + labelYOffset + 110);
+        document.getElementById('c2Number').setAttribute('x', currentX + pinnacleWidths.p2 / 2);
+        document.getElementById('c2Number').setAttribute('y', yBase + labelYOffset + 150);
+        currentX += pinnacleWidths.p2;
+    </script>
+
+    <rect id="p3Rect" x="0" y="0" class="pinnacle-rect p3-color" height="0" width="0"/>
+    <text id="p3Age" x="0" y="0" class="age-text">44-52 años</text>
+    <text id="p3Label" x="0" y="0" class="label-text">Pináculo 3</text>
+    <text id="p3Number" x="0" y="0" class="pinnacle-main-text">7</text>
+    <text id="c3Label" x="0" y="0" class="label-text">Desafío 3 (Principal)</text>
+    <text id="c3Number" x="0" y="0" class="challenge-main-text">2</text>
+    <script>
+        document.getElementById('p3Rect').setAttribute('x', currentX);
+        document.getElementById('p3Rect').setAttribute('y', yBase);
+        document.getElementById('p3Rect').setAttribute('width', pinnacleWidths.p3);
+        document.getElementById('p3Rect').setAttribute('height', pinnacleHeight + 60);
+
+        document.getElementById('p3Age').setAttribute('x', currentX + pinnacleWidths.p3 / 2);
+        document.getElementById('p3Age').setAttribute('y', ageYPos);
+
+        document.getElementById('p3Label').setAttribute('x', currentX + pinnacleWidths.p3 / 2);
+        document.getElementById('p3Label').setAttribute('y', yBase + labelYOffset + 10);
+        document.getElementById('p3Number').setAttribute('x', currentX + pinnacleWidths.p3 / 2);
+        document.getElementById('p3Number').setAttribute('y', yBase + labelYOffset + 60);
+
+        document.getElementById('c3Label').setAttribute('x', currentX + pinnacleWidths.p3 / 2);
+        document.getElementById('c3Label').setAttribute('y', yBase + labelYOffset + 110);
+        document.getElementById('c3Number').setAttribute('x', currentX + pinnacleWidths.p3 / 2);
+        document.getElementById('c3Number').setAttribute('y', yBase + labelYOffset + 150);
+        currentX += pinnacleWidths.p3;
+    </script>
+
+    <rect id="p4Rect" x="0" y="0" class="pinnacle-rect p4-color" height="0" width="0"/>
+    <text id="p4Age" x="0" y="0" class="age-text">53+ años</text>
+    <text id="p4Label" x="0" y="0" class="label-text">Pináculo 4</text>
+    <text id="p4Number" x="0" y="0" class="pinnacle-main-text">4</text>
+    <text id="c4Label" x="0" y="0" class="label-text">Desafío 4</text>
+    <text id="c4Number" x="0" y="0" class="challenge-main-text">2</text>
+    <script>
+        document.getElementById('p4Rect').setAttribute('x', currentX);
+        document.getElementById('p4Rect').setAttribute('y', yBase);
+        document.getElementById('p4Rect').setAttribute('width', pinnacleWidths.p4);
+        document.getElementById('p4Rect').setAttribute('height', pinnacleHeight + 60);
+
+        document.getElementById('p4Age').setAttribute('x', currentX + pinnacleWidths.p4 / 2);
+        document.getElementById('p4Age').setAttribute('y', ageYPos);
+
+        document.getElementById('p4Label').setAttribute('x', currentX + pinnacleWidths.p4 / 2);
+        document.getElementById('p4Label').setAttribute('y', yBase + labelYOffset + 10);
+        document.getElementById('p4Number').setAttribute('x', currentX + pinnacleWidths.p4 / 2);
+        document.getElementById('p4Number').setAttribute('y', yBase + labelYOffset + 60);
+
+        document.getElementById('c4Label').setAttribute('x', currentX + pinnacleWidths.p4 / 2);
+        document.getElementById('c4Label').setAttribute('y', yBase + labelYOffset + 110);
+        document.getElementById('c4Number').setAttribute('x', currentX + pinnacleWidths.p4 / 2);
+        document.getElementById('c4Number').setAttribute('y', yBase + labelYOffset + 150);
+    </script>
+
+    <line x1="0" y1="315" x2="850" y2="315" stroke="#CCC" stroke-width="1"/>
+    <text x="25" y="335" class="label-text">Edad:</text>
+    <script>
+      // Script para posicionar las marcas de edad principales de forma dinámica
+      // (Esta parte se podría mejorar mucho con una librería de D3.js, pero para SVG puro es más manual)
+      const ageLineY = 315;
+      let xPos = startX;
+      const ageLabels = ["0", "35", "44", "53", "Fin"]; // Edades de inicio de pináculos + Fin
+      const pinnacleStartsX = [
+          startX,
+          startX + pinnacleWidths.p1,
+          startX + pinnacleWidths.p1 + pinnacleWidths.p2,
+          startX + pinnacleWidths.p1 + pinnacleWidths.p2 + pinnacleWidths.p3,
+          startX + pinnacleWidths.p1 + pinnacleWidths.p2 + pinnacleWidths.p3 + pinnacleWidths.p4
+      ];
+
+      for(let i = 0; i < ageLabels.length; i++) {
+          const tick = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          tick.setAttribute("x1", pinnacleStartsX[i]);
+          tick.setAttribute("y1", ageLineY - 5);
+          tick.setAttribute("x2", pinnacleStartsX[i]);
+          tick.setAttribute("y2", ageLineY + 5);
+          tick.setAttribute("stroke", "#888");
+          tick.setAttribute("stroke-width", "1");
+          document.documentElement.appendChild(tick);
+
+          const ageTickLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          ageTickLabel.setAttribute("x", pinnacleStartsX[i]);
+          ageTickLabel.setAttribute("y", ageLineY + 20);
+          ageTickLabel.setAttribute("class", "label-text");
+          ageTickLabel.textContent = ageLabels[i];
+           // Ajuste para la primera y última etiqueta para que no se corten
+          if (i === 0) ageTickLabel.setAttribute("text-anchor", "start");
+          else if (i === ageLabels.length -1) ageTickLabel.setAttribute("text-anchor", "end");
+
+          document.documentElement.appendChild(ageTickLabel);
+      }
+    </script>
+
+</svg>

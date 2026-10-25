@@ -4,7 +4,7 @@ from pathlib import Path
 
 # Importar las funciones específicas de cada módulo
 from generators.creacionDocumentos import creacionDocumentos
-from utils.web_utils import descargaVerificacion
+from utils.web_utils import descargarVerificacion
 
 class DocumentGenerator:
     """
@@ -35,7 +35,7 @@ class DocumentGenerator:
 
 
         try:
-            descargaVerificacion(data, output_dir)
+            descargarVerificacion(data, output_dir)
         
         except Exception as e:
             self.logger.error(f"Error general en la generación de documentos: {str(e)}")
@@ -61,7 +61,17 @@ class DocumentGenerator:
             ]
             
             # Directorio base de plantillas
-            templates_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "plantillas")
+            import sys
+            if getattr(sys, 'frozen', False):
+                base_dir = os.path.dirname(os.path.abspath(sys.executable))
+            else:
+                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            
+            candidates_templates = [
+                os.path.join(base_dir, "plantillas"),
+                os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "plantillas")
+            ]
+            templates_dir = next((p for p in candidates_templates if os.path.exists(p)), candidates_templates[0])
             
             # Procesar cada plantilla
             for template_file in template_files:

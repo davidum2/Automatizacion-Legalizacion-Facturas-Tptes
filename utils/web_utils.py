@@ -64,9 +64,30 @@ def descargarVerificacion(data, carpeta_contenedora):
     
     driver = None
     try:
-        # Inicializar Chrome con WebDriver Manager
+        # Usar rutas locales de chromedriver y chrome.exe compatibles con ejecutable
+        import sys
+        if getattr(sys, 'frozen', False):
+            base_dir = os.path.dirname(os.path.abspath(sys.executable))
+        else:
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        candidates_driver = [
+            os.path.join(base_dir, 'WEBDRIVER', 'chromedriver.exe'),
+            os.path.join(base_dir, 'utils', 'WEBDRIVER', 'chromedriver.exe'),
+            os.path.join(os.path.dirname(__file__), '..', 'WEBDRIVER', 'chromedriver.exe')
+        ]
+        chromedriver_path = next((p for p in candidates_driver if os.path.exists(p)), candidates_driver[0])
+
+        candidates_chrome = [
+            os.path.join(base_dir, 'WEBDRIVER', 'chrome-win64', 'chrome.exe'),
+            os.path.join(base_dir, 'utils', 'WEBDRIVER', 'chrome-win64', 'chrome.exe'),
+            os.path.join(os.path.dirname(__file__), '..', 'WEBDRIVER', 'chrome-win64', 'chrome.exe')
+        ]
+        chrome_binary_path = next((p for p in candidates_chrome if os.path.exists(p)), candidates_chrome[0])
+        if os.path.exists(chrome_binary_path):
+            chrome_options.binary_location = os.path.abspath(chrome_binary_path)
         driver = webdriver.Chrome(
-            service=Service(ChromeDriverManager().install()),
+            service=Service(os.path.abspath(chromedriver_path)),
             options=chrome_options
         )
         

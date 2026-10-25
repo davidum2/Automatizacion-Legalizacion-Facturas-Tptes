@@ -1,0 +1,24 @@
+============================================================
+  LEGALIZACION DE FACTURAS TPTES - VERSION PORTABLE
+============================================================
+
+Version: 1.0 (Portable)
+Requisitos del Sistema: Windows 10 o Windows 11 (64-bit)
+
+INSTRUCCIONES DE USO:
+--------------------
+1. Puedes mover esta carpeta a cualquier ubicacion (Memoria USB, Disco Local, etc.).
+2. Para abrir el programa, haz doble clic en:
+   LegalizacionFacturasTptes.exe
+
+ESTRUCTURA DE ARCHIVOS:
+----------------------
+- LegalizacionFacturasTptes.exe : Ejecutable principal de la aplicacion grafica.
+- config_personal.json          : Configuracion del personal de recepcion y visto bueno.
+- plantillas/                   : Plantillas oficiales de Word (.docx):
+                                  * legalizacion_factura.docx
+                                  * legalizacion_verificacion.docx
+                                  * legalizacion_xml.docx
+                                  * xml.docx
+- WEBDRIVER/                    : Navegador Chrome portable y controlador para la verificacion en el SAT.
+- _internal/                    : Motor interno de Python y dependencias compiladas.

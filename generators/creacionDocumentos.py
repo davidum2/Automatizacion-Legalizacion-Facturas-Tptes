@@ -3,7 +3,7 @@ from docx import Document
 from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-def creacionDocumentos(template_path,output_dir, data, template_name):
+def creacionDocumentos(template_path, output_dir, data, template_name):
     """
     Crea un documento de legalización de factura basado en una plantilla.
     
@@ -16,9 +16,6 @@ def creacionDocumentos(template_path,output_dir, data, template_name):
         str: Ruta al documento generado
     """
     try:
-
-        
-
         # Verificar que la plantilla existe
         if not os.path.exists(template_path):
             raise FileNotFoundError(f"No se encontró la plantilla: {template_path}")
@@ -26,14 +23,11 @@ def creacionDocumentos(template_path,output_dir, data, template_name):
         # Cargar la plantilla
         doc = Document(template_path)
         
-
-        def formatear_combustible(diccionario):
-            if 'Diesel' in diccionario:
-                return f"{diccionario['Diesel']} Lts. de diesel"
-            elif 'Gasolina' in diccionario:
-                return f"{diccionario['Gasolina']} Lts. de gasolina"
-            else:
-                return "Tipo de combustible no reconocido"
+                # Función para aplicar el formato de texto (Geomanist, 10pt)
+        def aplicar_formato_texto(paragraph):
+            for run in paragraph.runs:
+                run.font.name = "Geomanist Regular"
+                run.font.size = Pt(10)
 
         # Buscar marcadores en el documento y reemplazarlos con los datos
         for paragraph in doc.paragraphs:
@@ -51,7 +45,7 @@ def creacionDocumentos(template_path,output_dir, data, template_name):
             if '{{MONTO}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{MONTO}}', data['monto'])
             if '{{EMPLEO_RECURSO}}' in paragraph.text:
-                paragraph.text = paragraph.text.replace('{{EMPLEO_RECURSO}}', formatear_combustible(data['Conceptos']))
+                paragraph.text = paragraph.text.replace('{{EMPLEO_RECURSO}}', data['Empleo_recurso'])
             if '{{MES}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{MES}}', data['Mes'])
             if '{{NO_MENSAJE}}' in paragraph.text:
@@ -70,6 +64,9 @@ def creacionDocumentos(template_path,output_dir, data, template_name):
                 paragraph.text = paragraph.text.replace('{{NOMBRE_VO_BO}}', data['Nombre_Vo_Bo'])
             if '{{MATRICULA_VO_BO}}' in paragraph.text:
                 paragraph.text = paragraph.text.replace('{{MATRICULA_VO_BO}}', data['Matricula_Vo_Bo'])
+
+            # Aplicar formato después de reemplazar el texto
+            aplicar_formato_texto(paragraph)
         
         # También buscar en las tablas
         for table in doc.tables:
@@ -107,9 +104,11 @@ def creacionDocumentos(template_path,output_dir, data, template_name):
                         if '{{MATRICULA_RECIBIO_LA_COMPRA}}' in paragraph.text:
                             paragraph.text = paragraph.text.replace('{{MATRICULA_RECIBIO_LA_COMPRA}}', data['Matricula_recibio_la_compra'])
                         
-        
+                        # Aplicar formato después de reemplazar el texto
+                        aplicar_formato_texto(paragraph)
+
         # Guardar el documento
-        output_path = os.path.join(output_dir, template_name+ ".docx")
+        output_path = os.path.join(output_dir, template_name + ".docx")
         doc.save(output_path)
         
         return output_path

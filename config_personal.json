@@ -1,0 +1,31 @@
+{
+    "lista_personal_recibe": [
+        {
+            "Grado_recibio_la_compra": "El Cor. Inf. E.M., Subjefe Admtvo.",
+            "Nombre_recibio_la_compra": "Heinz Patrick Luque Nuncio.",
+            "Matricula_recibio_la_compra": "B-5617591"
+        },
+        {
+            "Grado_recibio_la_compra": "Cor. Inf. E.M., Subjefe Optvo.",
+            "Nombre_recibio_la_compra": "Julio Cesar Chavez Castro",
+            "Matricula_recibio_la_compra": "B-7925740"
+        },
+        {
+            "Grado_recibio_la_compra": "Tte. Ofta., Enc. Tren Tptes.",
+            "Nombre_recibio_la_compra": "Daniel Alejandro Soria Mendoza",
+            "Matricula_recibio_la_compra": "C-6966540"
+        }
+    ],
+    "lista_personal_visto_bueno": [
+        {
+            "Grado_Vo_Bo": "Gral. Brig. E.M., Jefe Edo. Myr.",
+            "Nombre_Vo_Bo": "Didier Peralta Sánchez.",
+            "Matricula_Vo_Bo": "B-9661984"
+        },
+        {
+            "Grado_Vo_Bo": "Gral. Bgda. E.M., Cmte.",
+            "Nombre_Vo_Bo": "José Guillermo Lira Hernández",
+            "Matricula_Vo_Bo": "B-5046896"
+        }
+    ]
+}
